@@ -66,7 +66,7 @@ public class AccountService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        List<Account> myAccounts = accountRepository.findByMember(member);
+        List<Account> myAccounts = accountRepository.findByMemberAndAccountStatus(member, "ACTIVE");
 
         return myAccounts.stream()
                 .map(AccountResponseDto::new)
@@ -106,4 +106,20 @@ public class AccountService {
         transactionRepository.save(withdrawalTransaction);
         transactionRepository.save(depositTransaction);
     }
+    @Transactional
+    public void closeAccount(String accountNumber, String username) {
+        Account account = accountRepository.findById(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+
+        if (!account.getMember().getUsername().equals(username)) {
+            throw new IllegalStateException("본인 소유의 계좌만 해지할 수 있습니다.");
+        }
+
+        if (account.getBalance() != 0) {
+            throw new IllegalStateException("잔액이 0원인 계좌만 해지할 수 있습니다. 잔액을 모두 이체해주세요.");
+        }
+
+        account.setAccountStatus("CLOSED");
+    }
+
 }

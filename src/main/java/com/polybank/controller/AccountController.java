@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -49,7 +50,6 @@ public class AccountController {
         return "accounts";
     }
 
-    // 아래 GetMapping 메서드를 추가해주세요.
     @GetMapping("/{accountNumber}")
     public String accountDetailPage(@PathVariable String accountNumber,
                                     Model model,
@@ -61,5 +61,21 @@ public class AccountController {
         model.addAttribute("account", accountDetails);
 
         return "account-details";
+    }
+
+    @PostMapping("/{accountNumber}/delete")
+    public String closeAccount(@PathVariable String accountNumber,
+                               @AuthenticationPrincipal UserDetails userDetails,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            accountService.closeAccount(accountNumber, userDetails.getUsername());
+            redirectAttributes.addFlashAttribute("successMessage", "계좌가 정상적으로 해지되었습니다.");
+            return "redirect:/accounts";
+
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+
+            return "redirect:/accounts/" + accountNumber;
+        }
     }
 }

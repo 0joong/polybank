@@ -34,9 +34,16 @@ public class Account {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "account_status", nullable = false)
+    private String accountStatus;
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
+
+        if (this.accountStatus == null) {
+            this.accountStatus = "ACTIVE";
+        }
     }
 
     /**

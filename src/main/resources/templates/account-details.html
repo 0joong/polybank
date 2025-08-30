@@ -16,6 +16,11 @@
             계좌 상세 정보
         </div>
         <div class="card-body p-4">
+
+            <div th:if="${errorMessage}" class="alert alert-danger" role="alert"
+                 th:text="${errorMessage}">
+                에러 메시지가 여기에 표시됩니다.
+            </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between">
                     <span>계좌번호</span>
@@ -36,7 +41,12 @@
             </ul>
             <div class="d-flex justify-content-end mt-4">
                 <a th:href="@{/transactions(accountNumber=${account.accountNumber})}" class="btn btn-outline-primary me-2">거래내역</a>
-                <a th:href="@{/transfer(fromAccount=${account.accountNumber})}" class="btn btn-primary">이체</a>
+                <a th:href="@{/transfer(fromAccount=${account.accountNumber})}" class="btn btn-primary me-2">이체</a>
+
+                <form th:action="@{/accounts/{accNum}/delete(accNum=${account.accountNumber})}" method="post"
+                      onsubmit="return confirm('정말로 이 계좌를 해지하시겠습니까? 해지된 계좌는 복구할 수 없습니다.');">
+                    <button type="submit" class="btn btn-danger">계좌 해지</button>
+                </form>
             </div>
         </div>
     </div>

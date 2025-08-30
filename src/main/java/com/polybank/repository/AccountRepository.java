@@ -13,4 +13,6 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     Long getNextAccountNumberSequence();
 
     List<Account> findByMember(Member member);
+
+    List<Account> findByMemberAndAccountStatus(Member member, String status);
 }
