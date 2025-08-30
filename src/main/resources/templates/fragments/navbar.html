@@ -30,8 +30,10 @@
 
                 <div sec:authorize="isAuthenticated()">
                     <span class="navbar-text me-3">
-                        환영합니다, <strong sec:authentication="name">사용자이름</strong>님!
-                    </span>
+                        환영합니다,
+                        <strong sec:authentication="principal.username">사용자이름</strong>
+                        (<span th:text="${#authentication.principal.member.role.title}">역할</span>)님!
+                        </span>
                     <form th:action="@{/logout}" method="post" class="d-inline">
                         <button class="btn btn-outline-secondary" type="submit">로그아웃</button>
                     </form>

@@ -37,7 +37,18 @@ public class Member {
     @Column(name = "phone", length = 11)
     private String phone;
 
+    @Enumerated(EnumType.STRING) // Enum 타입을 DB에 문자열로 저장
+    @Column(name = "role", nullable = false)
+    private Role role;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    public void onPrePersist() {
+        if (this.role == null) {
+            this.role = Role.USER; // 처음 생성 시 기본 역할을 USER로 설정
+        }
+    }
 }
