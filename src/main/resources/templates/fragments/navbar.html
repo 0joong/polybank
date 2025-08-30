@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<nav class="navbar navbar-expand-lg bg-light" th:fragment="navbarFragment">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">PolyBank</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="isAuthenticated()">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/accounts}">조회</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/transfer}">이체</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/products}">금융상품</a>
+                </li>
+            </ul>
+
+            <div class="d-flex">
+                <div sec:authorize="isAnonymous()">
+                    <a class="btn btn-outline-primary me-2" th:href="@{/login}">로그인</a>
+                    <a class="btn btn-primary" th:href="@{/signup}">회원가입</a>
+                </div>
+
+                <div sec:authorize="isAuthenticated()">
+                    <span class="navbar-text me-3">
+                        환영합니다, <strong sec:authentication="name">사용자이름</strong>님!
+                    </span>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button class="btn btn-outline-secondary" type="submit">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+</html>
