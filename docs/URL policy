@@ -1,0 +1,12 @@
+Feature         UI URL                      API ENDPOINT                    HTTP Method     Description
+
+home            /                                                           GET
+login           /login                      /api/v1/members                 POST
+signup          /signup                     /api/v1/login                   POST
+
+account         /accounts                   /api/v1/accounts                GET             계좌 개설
+                                            /api/v1/accounts                POST            내 계좌 상세 정보
+                /accounts/{accountNumber}   /api/v1/accounts/{accountNumber}GET             특정 계좌 조회
+Transaction                                 /api/v1/accounts/{accountNumber}/transaction GET 특정 계좌 거래내역 조회
+                /accounts/deposit           /api/v1/transactions/deposit    POST            입금 처리
+                /accounts/withdraw          /api/v1/transactions/withdraw   POST            출금 처리
