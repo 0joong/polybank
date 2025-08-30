@@ -2,6 +2,7 @@ package com.polybank.service;
 
 import com.polybank.dto.request.CreateAccountRequestDto;
 import com.polybank.dto.request.TransferRequestDto;
+import com.polybank.dto.response.AccountDetailResponseDto;
 import com.polybank.dto.response.AccountResponseDto;
 import com.polybank.entity.Account;
 import com.polybank.entity.Member;
@@ -25,6 +26,18 @@ public class AccountService {
     private final MemberRepository memberRepository;
     private final TransactionRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Transactional(readOnly = true)
+    public AccountDetailResponseDto findAccountDetails(String accountNumber, String username) {
+        Account account = accountRepository.findById(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+
+        if (!account.getMember().getUsername().equals(username)) {
+            throw new IllegalStateException("본인 소유의 계좌만 조회할 수 있습니다.");
+        }
+
+        return new AccountDetailResponseDto(account);
+    }
 
     @Transactional
     public void createAccount(CreateAccountRequestDto requestDto, String username) {

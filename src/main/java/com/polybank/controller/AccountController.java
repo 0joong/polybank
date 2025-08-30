@@ -1,6 +1,7 @@
 package com.polybank.controller;
 
 import com.polybank.dto.request.CreateAccountRequestDto;
+import com.polybank.dto.response.AccountDetailResponseDto;
 import com.polybank.dto.response.AccountResponseDto;
 import com.polybank.repository.AccountRepository;
 import com.polybank.repository.MemberRepository;
@@ -12,10 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,5 +47,19 @@ public class AccountController {
         model.addAttribute("accounts", myAccounts);
 
         return "accounts";
+    }
+
+    // 아래 GetMapping 메서드를 추가해주세요.
+    @GetMapping("/{accountNumber}")
+    public String accountDetailPage(@PathVariable String accountNumber,
+                                    Model model,
+                                    @AuthenticationPrincipal UserDetails userDetails) {
+
+        String username = userDetails.getUsername();
+        AccountDetailResponseDto accountDetails = accountService.findAccountDetails(accountNumber, username);
+
+        model.addAttribute("account", accountDetails);
+
+        return "account-details";
     }
 }

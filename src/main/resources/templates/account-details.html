@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>계좌 상세</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/lux/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbarFragment}"></div>
+
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-header h4" th:text="|${account.accountType} 상세 정보|">
+            계좌 상세 정보
+        </div>
+        <div class="card-body p-4">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>계좌번호</span>
+                    <strong th:text="${account.accountNumber}"></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>예금주</span>
+                    <strong th:text="${account.ownerName}"></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>개설일</span>
+                    <strong th:text="${#temporals.format(account.createdAt, 'yyyy년 MM월 dd일')}"></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>현재 잔액</span>
+                    <strong class="h3 mb-0" th:text="|${#numbers.formatInteger(account.balance, 3, 'COMMA')} 원|"></strong>
+                </li>
+            </ul>
+            <div class="d-flex justify-content-end mt-4">
+                <a th:href="@{/transactions(accountNumber=${account.accountNumber})}" class="btn btn-outline-primary me-2">거래내역</a>
+                <a th:href="@{/transfer(fromAccount=${account.accountNumber})}" class="btn btn-primary">이체</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

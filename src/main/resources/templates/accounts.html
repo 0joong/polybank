@@ -29,10 +29,12 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text fs-5" th:text="${account.accountNumber}">계좌 번호</p>
-                    <div class="d-flex justify-content-between align-items-center">
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
                         <span class="h3 mb-0" th:text="|${#numbers.formatInteger(account.balance, 3, 'COMMA')} 원|">잔액</span>
 
                         <div>
+                            <a th:href="@{/accounts/{accNum}(accNum=${account.accountNumber})}" class="btn btn-outline-secondary btn-sm">상세정보</a>
                             <a th:href="@{/transactions(accountNumber=${account.accountNumber})}" class="btn btn-outline-primary btn-sm">거래내역</a>
                             <a th:href="@{/transfer(fromAccount=${account.accountNumber})}" class="btn btn-primary btn-sm">이체</a>
                         </div>
