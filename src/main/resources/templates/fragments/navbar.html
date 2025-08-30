@@ -20,6 +20,10 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/products}">금융상품</a>
                 </li>
+
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" th:href="@{/admin}">관리자 페이지</a>
+                </li>
             </ul>
 
             <div class="d-flex">
@@ -33,7 +37,7 @@
                         환영합니다,
                         <strong sec:authentication="principal.username">사용자이름</strong>
                         (<span th:text="${#authentication.principal.member.role.title}">역할</span>)님!
-                        </span>
+                    </span>
                     <form th:action="@{/logout}" method="post" class="d-inline">
                         <button class="btn btn-outline-secondary" type="submit">로그아웃</button>
                     </form>
