@@ -1,11 +1,14 @@
 package com.polybank.service;
 
 import com.polybank.dto.request.CreateAccountRequestDto;
+import com.polybank.dto.request.TransferRequestDto;
 import com.polybank.dto.response.AccountResponseDto;
 import com.polybank.entity.Account;
 import com.polybank.entity.Member;
+import com.polybank.entity.Transaction;
 import com.polybank.repository.AccountRepository;
 import com.polybank.repository.MemberRepository;
+import com.polybank.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final MemberRepository memberRepository;
+    private final TransactionRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -54,5 +58,39 @@ public class AccountService {
         return myAccounts.stream()
                 .map(AccountResponseDto::new)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void executeTransfer(TransferRequestDto requestDto, String username) {
+        // 출금 계좌와 입금 계좌 조회
+        Account fromAccount = accountRepository.findById(requestDto.getFromAccountNumber())
+                .orElseThrow(() -> new IllegalArgumentException("출금 계좌를 찾을 수 없습니다."));
+        Account toAccount = accountRepository.findById(requestDto.getToAccountNumber())
+                .orElseThrow(() -> new IllegalArgumentException("입금 계좌를 찾을 수 없습니다."));
+
+        // 유효성 검증
+        // 출금 계좌 소유주가 현재 로그인한 사용자인지 확인
+        if (!fromAccount.getMember().getUsername().equals(username)) {
+            throw new IllegalStateException("본인 소유의 계좌에서만 출금할 수 있습니다.");
+        }
+        // 계좌 비밀번호 확인
+        if (!passwordEncoder.matches(requestDto.getPassword(), fromAccount.getPassword())) {
+            throw new IllegalArgumentException("계좌 비밀번호가 일치하지 않습니다.");
+        }
+        // 잔액 확인
+        if (fromAccount.getBalance() < requestDto.getAmount()) {
+            throw new IllegalStateException("잔액이 부족합니다.");
+        }
+
+        // 이체 로직
+        fromAccount.withdraw(requestDto.getAmount());
+        toAccount.deposit(requestDto.getAmount());
+
+        // 거래 내역 기록 (출금/입금)
+        Transaction withdrawalTransaction = new Transaction(fromAccount, "TRANSFER_OUT", requestDto.getAmount(), fromAccount.getBalance(), toAccount.getAccountNumber());
+        Transaction depositTransaction = new Transaction(toAccount, "TRANSFER_IN", requestDto.getAmount(), toAccount.getBalance(), fromAccount.getAccountNumber());
+
+        transactionRepository.save(withdrawalTransaction);
+        transactionRepository.save(depositTransaction);
     }
 }

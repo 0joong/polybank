@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>이체</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/lux/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbarFragment}"></div>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header text-center h4">
+                    계좌 이체
+                </div>
+                <div class="card-body p-4">
+
+                    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}">
+                        에러 메시지가 여기에 표시됩니다.
+                    </div>
+                    <form th:action="@{/transfer}" method="post">
+                        <div class="mb-3">
+                            <label for="fromAccountNumber" class="form-label">출금 계좌</label>
+                            <select class="form-select" id="fromAccountNumber" name="fromAccountNumber" required>
+                                <option value="">-- 계좌 선택 --</option>
+                                <option th:each="account : ${myAccounts}"
+                                        th:value="${account.accountNumber}"
+                                        th:text="|${account.accountType == '10' ? '자유입출금' : '기타'} - ${account.accountNumber}|">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="toAccountNumber" class="form-label">입금 계좌</label>
+                            <input type="text" class="form-control" id="toAccountNumber" name="toAccountNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">이체 금액</label>
+                            <input type="number" class="form-control" id="amount" name="amount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">계좌 비밀번호</label>
+                            <input type="password" class="form-control" id="password" name="password" required maxlength="4">
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">이체하기</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

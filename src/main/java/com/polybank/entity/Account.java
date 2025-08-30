@@ -38,4 +38,23 @@ public class Account {
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    /**
+     * 입금 기능: 현재 잔액에 입금액을 더합니다.
+     * @param amount 입금할 금액
+     */
+    public void deposit(Long amount) {
+        this.balance += amount;
+    }
+
+    /**
+     * 출금 기능: 현재 잔액에서 출금액을 차감합니다.
+     * @param amount 출금할 금액
+     */
+    public void withdraw(Long amount) {
+        if (this.balance < amount) {
+            throw new IllegalStateException("잔액이 부족합니다.");
+        }
+        this.balance -= amount;
+    }
 }

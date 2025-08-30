@@ -39,4 +39,12 @@ public class Transaction {
     @CreationTimestamp
     @Column(name = "transaction_date", nullable = false, updatable = false)
     private LocalDateTime transactionDate;
+
+    public Transaction(Account account, String transactionType, Long amount, Long balanceAfterTransaction, String description) {
+        this.account = account;
+        this.transactionType = transactionType;
+        this.amount = amount;
+        this.balanceAfterTransaction = balanceAfterTransaction;
+        this.description = description;
+    }
 }
