@@ -16,35 +16,38 @@
     </div>
 
     <div class="row">
-        <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-header">전체 사용자 수</div>
-                <div class="card-body">
-                    <h4 class="card-title">123 명</h4>
-                    <p class="card-text">현재 가입된 총 회원 수입니다.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">총 계좌 수</div>
-                <div class="card-body">
-                    <h4 class="card-title">456 개</h4>
-                    <p class="card-text">현재 개설된 총 계좌 수입니다.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-header">오늘의 거래량</div>
-                <div class="card-body">
-                    <h4 class="card-title">789 건</h4>
-                    <p class="card-text">오늘 발생한 총 거래 건수입니다.</p>
-                </div>
-            </div>
-        </div>
     </div>
 
+    <div class="card mt-5">
+        <div class="card-header h5">
+            신규 금융상품 등록
+        </div>
+        <div class="card-body">
+            <form th:action="@{/admin/products}" method="post">
+                <div class="mb-3">
+                    <label for="productName" class="form-label">상품명</label>
+                    <input type="text" class="form-control" id="productName" name="productName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="productType" class="form-label">상품 종류</label>
+                    <select class="form-select" id="productType" name="productType" required>
+                        <option value="">-- 종류 선택 --</option>
+                        <option value="DEPOSIT">예금</option>
+                        <option value="SAVINGS">적금</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="interestRate" class="form-label">기본 이자율 (%)</label>
+                    <input type="number" step="0.01" class="form-control" id="interestRate" name="interestRate" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">상품 설명</label>
+                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">상품 등록</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -37,6 +38,15 @@ public class Account {
     @Column(name = "account_status", nullable = false)
     private String accountStatus;
 
+    @Column(name = "credit_limit")
+    private Long creditLimit;
+
+    @Column(name = "maturity_date")
+    private LocalDate maturityDate;
+
+    @Column(name = "interest_rate")
+    private Double interestRate;
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -59,8 +69,9 @@ public class Account {
      * @param amount 출금할 금액
      */
     public void withdraw(Long amount) {
-        if (this.balance < amount) {
-            throw new IllegalStateException("잔액이 부족합니다.");
+        // (현재 잔액 + 마이너스 한도)가 출금액보다 적으면 예외 발생
+        if ((this.balance + this.creditLimit) < amount) {
+            throw new IllegalStateException("출금 가능한 한도를 초과했습니다.");
         }
         this.balance -= amount;
     }
