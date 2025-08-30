@@ -37,7 +37,7 @@ public class Member {
     @Column(name = "phone", length = 11)
     private String phone;
 
-    @CreationTimestamp // 4. 자동 생성 시간
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 }

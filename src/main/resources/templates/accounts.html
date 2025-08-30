@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>내 계좌 - PolyBank</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/lux/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbarFragment}"></div>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">나의 계좌 목록</h1>
+        <a th:href="@{/products}" class="btn btn-primary">계좌 개설하러 가기</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header h5">
+                    자유입출금 통장
+                </div>
+                <div class="card-body">
+                    <p class="card-text fs-5">10-000001</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h3 mb-0">1,234,567 원</span>
+                        <a href="#" class="btn btn-outline-primary">거래내역 조회</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
