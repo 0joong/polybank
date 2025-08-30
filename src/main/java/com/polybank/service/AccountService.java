@@ -1,6 +1,7 @@
 package com.polybank.service;
 
 import com.polybank.dto.request.CreateAccountRequestDto;
+import com.polybank.dto.request.DepositWithdrawRequestDto;
 import com.polybank.dto.request.TransferRequestDto;
 import com.polybank.dto.response.AccountDetailResponseDto;
 import com.polybank.dto.response.AccountResponseDto;
@@ -120,6 +121,39 @@ public class AccountService {
         }
 
         account.setAccountStatus("CLOSED");
+    }
+
+    @Transactional
+    public void deposit(DepositWithdrawRequestDto requestDto) {
+        Account account = accountRepository.findById(requestDto.getAccountNumber())
+                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+
+        // 입금 처리
+        account.deposit(requestDto.getAmount());
+
+        // 거래내역 기록
+        Transaction transaction = new Transaction(account, "DEPOSIT", requestDto.getAmount(), account.getBalance(), "계좌 입금");
+        transactionRepository.save(transaction);
+    }
+
+    @Transactional
+    public void withdraw(DepositWithdrawRequestDto requestDto, String username) {
+        Account account = accountRepository.findById(requestDto.getAccountNumber())
+                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+
+        if (!account.getMember().getUsername().equals(username)) {
+            throw new IllegalStateException("본인 소유의 계좌에서만 출금할 수 있습니다.");
+        }
+        if (!passwordEncoder.matches(requestDto.getPassword(), account.getPassword())) {
+            throw new IllegalArgumentException("계좌 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 출금 처리
+        account.withdraw(requestDto.getAmount());
+
+        // 거래내역 기록
+        Transaction transaction = new Transaction(account, "WITHDRAW", requestDto.getAmount(), account.getBalance(), "계좌 출금");
+        transactionRepository.save(transaction);
     }
 
 }

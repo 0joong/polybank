@@ -12,7 +12,7 @@
 
 <div class="container my-5">
     <div class="card shadow-sm">
-        <div class="card-header h4" th:text="|${account.accountType} 상세 정보|">
+        <div class="card-header h4" th:text="|${account.accountType == '10' ? '자유입출금 통장' : '기타 통장'} 상세 정보|">
             계좌 상세 정보
         </div>
         <div class="card-body p-4">
@@ -40,6 +40,8 @@
                 </li>
             </ul>
             <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#depositModal">입금</button>
+                <button type="button" class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#withdrawModal">출금</button>
                 <a th:href="@{/transactions(accountNumber=${account.accountNumber})}" class="btn btn-outline-primary me-2">거래내역</a>
                 <a th:href="@{/transfer(fromAccount=${account.accountNumber})}" class="btn btn-primary me-2">이체</a>
 
@@ -52,6 +54,53 @@
     </div>
 </div>
 
+<div class="modal fade" id="depositModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/accounts/{accNum}/deposit(accNum=${account.accountNumber})}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">입금</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="depositAmount" class="form-label">입금 금액</label>
+                    <input type="number" class="form-control" id="depositAmount" name="amount" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="submit" class="btn btn-primary">입금하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="withdrawModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/accounts/{accNum}/withdraw(accNum=${account.accountNumber})}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">출금</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="withdrawAmount" class="form-label">출금 금액</label>
+                        <input type="number" class="form-control" id="withdrawAmount" name="amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="withdrawPassword" class="form-label">계좌 비밀번호</label>
+                        <input type="password" class="form-control" id="withdrawPassword" name="password" required maxlength="4">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="submit" class="btn btn-primary">출금하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

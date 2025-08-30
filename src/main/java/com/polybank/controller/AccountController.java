@@ -1,6 +1,7 @@
 package com.polybank.controller;
 
 import com.polybank.dto.request.CreateAccountRequestDto;
+import com.polybank.dto.request.DepositWithdrawRequestDto;
 import com.polybank.dto.response.AccountDetailResponseDto;
 import com.polybank.dto.response.AccountResponseDto;
 import com.polybank.repository.AccountRepository;
@@ -77,5 +78,30 @@ public class AccountController {
 
             return "redirect:/accounts/" + accountNumber;
         }
+    }
+
+    @PostMapping("/{accountNumber}/deposit")
+    public String deposit(@PathVariable String accountNumber,
+                          @ModelAttribute DepositWithdrawRequestDto requestDto,
+                          RedirectAttributes redirectAttributes) {
+
+        requestDto.setAccountNumber(accountNumber);
+        accountService.deposit(requestDto);
+
+        redirectAttributes.addFlashAttribute("successMessage", "입금이 완료되었습니다.");
+        return "redirect:/accounts/" + accountNumber;
+    }
+
+    @PostMapping("/{accountNumber}/withdraw")
+    public String withdraw(@PathVariable String accountNumber,
+                           @ModelAttribute DepositWithdrawRequestDto requestDto,
+                           @AuthenticationPrincipal UserDetails userDetails,
+                           RedirectAttributes redirectAttributes) {
+
+        requestDto.setAccountNumber(accountNumber);
+        accountService.withdraw(requestDto, userDetails.getUsername());
+
+        redirectAttributes.addFlashAttribute("successMessage", "출금이 완료되었습니다.");
+        return "redirect:/accounts/" + accountNumber;
     }
 }
