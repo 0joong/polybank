@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>내 계좌 - PolyBank</title>
+    <title>내 계좌</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/lux/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -11,28 +11,24 @@
 
 <div th:replace="~{fragments/navbar :: navbarFragment}"></div>
 
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">나의 계좌 목록</h1>
-        <a th:href="@{/products}" class="btn btn-primary">계좌 개설하러 가기</a>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header h5">
-                    자유입출금 통장
-                </div>
-                <div class="card-body">
-                    <p class="card-text fs-5">10-000001</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="h3 mb-0">1,234,567 원</span>
-                        <a href="#" class="btn btn-outline-primary">거래내역 조회</a>
-                    </div>
+<div class="row">
+    <div class="col-md-6 mb-4" th:each="account : ${accounts}">
+        <div class="card shadow-sm">
+            <div class="card-header h5" th:text="${account.accountType == '10' ? '자유입출금 통장' : '기타 통장'}">
+                계좌 종류
+            </div>
+            <div class="card-body">
+                <p class="card-text fs-5" th:text="${account.accountNumber}">계좌 번호</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="h3 mb-0" th:text="|${#numbers.formatInteger(account.balance, 3, 'COMMA')} 원|">잔액</span>
+                    <a href="#" class="btn btn-outline-primary">거래내역 조회</a>
                 </div>
             </div>
         </div>
+    </div>
 
+    <div class="text-center" th:if="${#lists.isEmpty(accounts)}">
+        <p class="lead text-muted">보유한 계좌가 없습니다. 지금 바로 계좌를 개설해보세요!</p>
     </div>
 </div>
 

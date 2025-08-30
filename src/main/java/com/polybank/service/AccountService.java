@@ -1,6 +1,7 @@
 package com.polybank.service;
 
 import com.polybank.dto.request.CreateAccountRequestDto;
+import com.polybank.dto.response.AccountResponseDto;
 import com.polybank.entity.Account;
 import com.polybank.entity.Member;
 import com.polybank.repository.AccountRepository;
@@ -9,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +42,17 @@ public class AccountService {
         newAccount.setBalance(0L);
 
         accountRepository.save(newAccount);
+    }
+
+    @Transactional(readOnly = true) // 읽기 전용 트랜잭션
+    public List<AccountResponseDto> findMyAccounts(String username) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        List<Account> myAccounts = accountRepository.findByMember(member);
+
+        return myAccounts.stream()
+                .map(AccountResponseDto::new)
+                .collect(Collectors.toList());
     }
 }

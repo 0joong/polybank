@@ -1,15 +1,19 @@
 package com.polybank.controller;
 
 import com.polybank.dto.request.CreateAccountRequestDto;
+import com.polybank.dto.response.AccountResponseDto;
 import com.polybank.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,12 +22,6 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping
-    public String myAccountPage() {
-        return "accounts";
-    }
-
-    // 아래 메서드를 추가해주세요.
     @GetMapping("/new")
     public String createAccountForm() {
         return "create-account-form";
@@ -38,5 +36,14 @@ public class AccountController {
         accountService.createAccount(requestDto, username);
 
         return "redirect:/accounts";
+    }
+
+    @GetMapping
+    public String myAccountPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        List<AccountResponseDto> myAccounts = accountService.findMyAccounts(username);
+        model.addAttribute("accounts", myAccounts);
+
+        return "accounts";
     }
 }
