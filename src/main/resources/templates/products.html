@@ -17,14 +17,19 @@
     </div>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 mb-4" th:each="product : ${products}">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">자유입출금 통장</h5>
-                    <p class="card-text">언제 어디서나 자유롭게 입출금하고, 편리한 금융 생활을 시작하세요.</p>
+                    <h5 class="card-title" th:text="${product.productName}">상품명</h5>
+                    <h6 class="card-subtitle mb-2 text-muted" th:text="|금리: ${product.interestRate}%|">금리</h6>
+                    <p class="card-text" th:text="${product.description}">상품 설명.</p>
                     <a th:href="@{/accounts/new}" class="btn btn-primary">계좌 개설하기</a>
                 </div>
             </div>
+        </div>
+
+        <div class="text-center" th:if="${#lists.isEmpty(products)}">
+            <p class="lead text-muted">현재 가입 가능한 금융상품이 없습니다.</p>
         </div>
     </div>
 </div>
