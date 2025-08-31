@@ -47,12 +47,12 @@ public class AccountService {
 
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        // 상품 타입 문자열을 두 자리 코드로 변환합니다.(헬퍼 메서드 이용)
+        // 상품 타입 문자열을 두 자리 코드로 변환(헬퍼 메서드 이용)
         String productCode = getProductCodeByType(requestDto.getAccountType());
 
         Long nextSeq = accountRepository.getNextAccountNumberSequence();
 
-        // 변환된 상품 코드를 사용하여 계좌번호를 생성합니다. (예: 12-000001)
+        // 변환된 상품 코드를 사용하여 계좌번호를 생성(예: 12-000001)
         String newAccountNumber = String.format("%s-%06d", productCode, nextSeq);
 
         Account newAccount = new Account();
