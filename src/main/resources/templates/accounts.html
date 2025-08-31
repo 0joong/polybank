@@ -24,15 +24,13 @@
     <div class="row">
         <div class="col-md-6 mb-4" th:each="account : ${accounts}">
             <div class="card shadow-sm">
-                <div class="card shadow-sm">
-                    <div class="card-header h5" th:switch="${account.accountType}">
+                <div class="card-header h5" th:switch="${account.accountType}">
                         <span th:case="'10'">자유입출금 통장</span>
                         <span th:case="'11'">적금 통장</span>
                         <span th:case="'12'">예금 통장</span>
                         <span th:case="*">기타 통장</span> </div>
                     <div class="card-body">
                     </div>
-                </div>
                 <div class="card-body">
                     <p class="card-text fs-5" th:text="${account.accountNumber}">계좌 번호</p>
 
