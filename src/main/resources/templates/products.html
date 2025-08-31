@@ -23,7 +23,7 @@
                     <h5 class="card-title" th:text="${product.productName}">상품명</h5>
                     <h6 class="card-subtitle mb-2 text-muted" th:text="|금리: ${product.interestRate}%|">금리</h6>
                     <p class="card-text" th:text="${product.description}">상품 설명.</p>
-                    <a th:href="@{/accounts/new}" class="btn btn-primary">계좌 개설하기</a>
+                    <a th:href="@{/accounts/new(productId=${product.id})}" class="btn btn-primary">계좌 개설하기</a>
                 </div>
             </div>
         </div>

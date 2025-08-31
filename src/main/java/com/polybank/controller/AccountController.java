@@ -4,7 +4,9 @@ import com.polybank.dto.request.CreateAccountRequestDto;
 import com.polybank.dto.request.DepositWithdrawRequestDto;
 import com.polybank.dto.response.AccountDetailResponseDto;
 import com.polybank.dto.response.AccountResponseDto;
+import com.polybank.entity.FinancialProduct;
 import com.polybank.repository.AccountRepository;
+import com.polybank.repository.FinancialProductRepository;
 import com.polybank.repository.MemberRepository;
 import com.polybank.repository.TransactionRepository;
 import com.polybank.service.AccountService;
@@ -25,9 +27,15 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final FinancialProductRepository financialProductRepository;
 
     @GetMapping("/new")
-    public String createAccountForm() {
+    public String createAccountForm(@RequestParam Long productId, Model model) {
+        FinancialProduct product = financialProductRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품 정보를 찾을 수 없습니다."));
+
+        model.addAttribute("product", product);
+
         return "create-account-form";
     }
 

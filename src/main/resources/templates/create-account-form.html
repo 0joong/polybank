@@ -20,10 +20,9 @@
                 <div class="card-body p-4">
                     <form th:action="@{/accounts}" method="post">
                         <div class="mb-3">
-                            <label for="accountType" class="form-label">상품 종류</label>
-                            <select class="form-select" id="accountType" name="accountType" required>
-                                <option value="10" selected>자유입출금 통장</option>
-                            </select>
+                            <label for="productName" class="form-label">선택한 상품</label>
+                            <input type="text" class="form-control" id="productName" th:value="${product.productName}" disabled>
+                            <input type="hidden" name="accountType" th:value="${product.productType}">
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">계좌 비밀번호</label>

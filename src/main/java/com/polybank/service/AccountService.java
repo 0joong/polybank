@@ -47,19 +47,33 @@ public class AccountService {
 
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
+        // 상품 타입 문자열을 두 자리 코드로 변환합니다.(헬퍼 메서드 이용)
+        String productCode = getProductCodeByType(requestDto.getAccountType());
+
         Long nextSeq = accountRepository.getNextAccountNumberSequence();
 
-        // 계좌번호 직접 생성 (예: 10-000001)
-        String newAccountNumber = String.format("%s-%06d", requestDto.getAccountType(), nextSeq);
+        // 변환된 상품 코드를 사용하여 계좌번호를 생성합니다. (예: 12-000001)
+        String newAccountNumber = String.format("%s-%06d", productCode, nextSeq);
 
         Account newAccount = new Account();
         newAccount.setAccountNumber(newAccountNumber);
         newAccount.setMember(member);
-        newAccount.setAccountType(requestDto.getAccountType());
+        newAccount.setAccountType(productCode);
         newAccount.setPassword(encodedPassword);
         newAccount.setBalance(0L);
 
         accountRepository.save(newAccount);
+    }
+
+    /**
+     * 상품 타입 문자열(DEPOSIT, SAVINGS 등)을 두 자리 상품 코드로 변환하는 헬퍼 메서드
+     */
+    private String getProductCodeByType(String productType) {
+        return switch (productType) {
+            case "DEPOSIT" -> "12"; // 예금
+            case "SAVINGS" -> "11"; // 적금
+            default -> "10";      // 자유입출금 등 기본값
+        };
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
