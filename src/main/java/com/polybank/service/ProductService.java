@@ -30,4 +30,9 @@ public class ProductService {
     public List<FinancialProduct> findAllProducts() {
         return productRepository.findAll();
     }
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+        productRepository.deleteById(productId);
+    }
 }
