@@ -1,19 +1,13 @@
 package com.polybank.controller;
 
-import com.polybank.dto.request.CreateAccountRequestDto;
-import com.polybank.dto.request.DepositWithdrawRequestDto;
-import com.polybank.dto.response.AccountDetailResponseDto;
-import com.polybank.dto.response.AccountResponseDto;
+import com.polybank.dto.request.*;
+import com.polybank.dto.response.*;
 import com.polybank.entity.FinancialProduct;
-import com.polybank.repository.AccountRepository;
 import com.polybank.repository.FinancialProductRepository;
-import com.polybank.repository.MemberRepository;
-import com.polybank.repository.TransactionRepository;
 import com.polybank.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +61,9 @@ public class AccountController {
         String username = userDetails.getUsername();
         AccountDetailResponseDto accountDetails = accountService.findAccountDetails(accountNumber, username);
 
+        List<AutoDebitResponseDto> autoDebits = accountService.findAutoDebitsByAccountNumber(accountNumber, username);
         model.addAttribute("account", accountDetails);
+        model.addAttribute("autoDebits", autoDebits);
 
         return "account-details";
     }
@@ -111,5 +107,36 @@ public class AccountController {
 
         redirectAttributes.addFlashAttribute("successMessage", "출금이 완료되었습니다.");
         return "redirect:/accounts/" + accountNumber;
+    }
+
+    @PostMapping("/{accountNumber}/auto-debit")
+    public String createAutoDebit(@PathVariable String accountNumber,
+                                  @ModelAttribute CreateAutoDebitRequestDto requestDto,
+                                  @AuthenticationPrincipal UserDetails userDetails,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            accountService.createAutoDebit(accountNumber, requestDto, userDetails.getUsername());
+            redirectAttributes.addFlashAttribute("successMessage", "자동이체가 성공적으로 등록되었습니다.");
+            return "redirect:/accounts/" + accountNumber;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/accounts/" + accountNumber;
+        }
+    }
+
+    @PostMapping("/auto-debit/{debitId}/delete")
+    public String deleteAutoDebit(@PathVariable Long debitId,
+                                  @AuthenticationPrincipal UserDetails userDetails,
+                                  RedirectAttributes redirectAttributes) {
+
+        try {
+            accountService.deleteAutoDebit(debitId, userDetails.getUsername());
+            redirectAttributes.addFlashAttribute("successMessage", "자동이체가 정상적으로 해지되었습니다.");
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        // 계좌 목록 페이지로 이동
+        return "redirect:/accounts";
     }
 }

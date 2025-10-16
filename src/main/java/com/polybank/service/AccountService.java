@@ -1,14 +1,18 @@
 package com.polybank.service;
 
 import com.polybank.dto.request.CreateAccountRequestDto;
+import com.polybank.dto.request.CreateAutoDebitRequestDto;
 import com.polybank.dto.request.DepositWithdrawRequestDto;
 import com.polybank.dto.request.TransferRequestDto;
 import com.polybank.dto.response.AccountDetailResponseDto;
 import com.polybank.dto.response.AccountResponseDto;
+import com.polybank.dto.response.AutoDebitResponseDto;
 import com.polybank.entity.Account;
+import com.polybank.entity.AutoDebit;
 import com.polybank.entity.Member;
 import com.polybank.entity.Transaction;
 import com.polybank.repository.AccountRepository;
+import com.polybank.repository.AutoDebitRepository;
 import com.polybank.repository.MemberRepository;
 import com.polybank.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final MemberRepository memberRepository;
     private final TransactionRepository transactionRepository;
+    private final AutoDebitRepository autoDebitRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
@@ -170,4 +175,88 @@ public class AccountService {
         transactionRepository.save(transaction);
     }
 
+    @Transactional
+    public Account createAndDisburseLoan(Member member, Long loanAmount) {
+        String productCode = "30"; // 30은 대출 의미
+        Long nextSeq = accountRepository.getNextAccountNumberSequence();
+        String newAccountNumber = String.format("%s-%06d", productCode, nextSeq);
+
+        Account loanAccount = new Account();
+        loanAccount.setAccountNumber(newAccountNumber);
+        loanAccount.setMember(member);
+        loanAccount.setAccountType(productCode);
+        loanAccount.setPassword(passwordEncoder.encode("0000"));
+        loanAccount.setBalance(loanAmount);
+        loanAccount.setAccountStatus("ACTIVE");
+
+        accountRepository.save(loanAccount);
+
+        Transaction disbursementTransaction = new Transaction(
+                loanAccount,
+                "LOAN_DISBURSEMENT",
+                loanAmount,
+                loanAccount.getBalance(),
+                "대출금 입금"
+        );
+        transactionRepository.save(disbursementTransaction);
+
+        return loanAccount;
+    }
+
+    @Transactional
+    public void createAutoDebit(String fromAccountNumber, CreateAutoDebitRequestDto requestDto, String username) {
+        // 1. 출금 계좌 조회
+        Account fromAccount = accountRepository.findById(fromAccountNumber)
+                .orElseThrow(() -> new IllegalArgumentException("출금 계좌를 찾을 수 없습니다."));
+
+        // 2. 입금 계좌 존재 여부 확인
+        if (!accountRepository.existsById(requestDto.getToAccountNumber())) {
+            throw new IllegalArgumentException("입금 계좌를 찾을 수 없습니다.");
+        }
+
+        // 3. 계좌 소유주 및 비밀번호 확인
+        if (!fromAccount.getMember().getUsername().equals(username)) {
+            throw new IllegalStateException("본인 소유의 계좌에서만 자동이체를 등록할 수 있습니다.");
+        }
+        if (!passwordEncoder.matches(requestDto.getPassword(), fromAccount.getPassword())) {
+            throw new IllegalArgumentException("계좌 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 4. 자동이체 정보 생성 및 저장
+        AutoDebit autoDebit = new AutoDebit(
+                fromAccount,
+                requestDto.getToAccountNumber(),
+                requestDto.getAmount(),
+                requestDto.getTransferDay()
+        );
+
+        autoDebitRepository.save(autoDebit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AutoDebitResponseDto> findAutoDebitsByAccountNumber(String accountNumber, String username) {
+        Account account = accountRepository.findById(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+
+        if (!account.getMember().getUsername().equals(username)) {
+            throw new IllegalStateException("본인 소유의 계좌만 조회할 수 있습니다.");
+        }
+
+        return autoDebitRepository.findByFromAccount_AccountNumber(accountNumber).stream()
+                .map(AutoDebitResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteAutoDebit(Long autoDebitId, String username) {
+        AutoDebit autoDebit = autoDebitRepository.findById(autoDebitId)
+                .orElseThrow(() -> new IllegalArgumentException("자동이체 정보를 찾을 수 없습니다."));
+
+        // 해지를 요청한 사용자가 자동이체를 등록한 계좌의 소유주인지 확인
+        if (!autoDebit.getFromAccount().getMember().getUsername().equals(username)) {
+            throw new IllegalStateException("권한이 없습니다.");
+        }
+
+        autoDebitRepository.delete(autoDebit);
+    }
 }
